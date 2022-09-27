@@ -1,0 +1,14 @@
+peertube:
+  hosts:
+    xyz00:
+      ansible_ssh_host: xyz00.hostsharing.net
+      ansible_ssh_user: xyz00
+      pac: xyz00
+      domain: tube.example.org
+      user: peertube
+      password: testpassw0rd_changeme
+
+      # see https://nodejs.org/en/about/releases/
+      noderelease: 16
+      # see https://nodejs.org/download/release/latest-v16.x/
+      nodeversion: v16.13.1
