@@ -8,6 +8,9 @@ peertube:
       user: peertube
       password: testpassw0rd_changeme
 
+      # see https://github.com/Chocobozzz/PeerTube/releases
+      peertube_release: "4.3.1"
+
       # see https://nodejs.org/en/about/releases/
       noderelease: 16
       # see https://nodejs.org/download/release/latest-v16.x/

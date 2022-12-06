@@ -5,7 +5,7 @@ listen:
 # Correspond to your reverse proxy server_name/listen configuration (i.e., your public PeerTube instance URL)
 webserver:
   https: true
-  hostname: 'example.com'
+  hostname: '{{domain}}'
   port: 443
 
 rates_limit:
@@ -42,8 +42,9 @@ database:
   port: 5432
   ssl: false
   suffix: '_prod'
-  username: 'peertube'
-  password: 'peertube'
+  name: '{{pac}}_{{user}}'
+  username: '{{pac}}_{{user}}'
+  password: '{{password}}'
   pool:
     max: 5
 
@@ -64,12 +65,12 @@ smtp:
   sendmail: null
   hostname: null
   port: 465 # If you use StartTLS: 587
-  username: null
-  password: null
+  username: '{{pac}}_{{user}}'
+  password: '{{password}}'
   tls: true # If you use StartTLS: false
   disable_starttls: false
   ca_file: null # Used for self signed certificates
-  from_address: 'admin@example.com'
+  from_address: 'admin@{{domain}}'
 
 email:
   body:
@@ -107,19 +108,19 @@ defaults:
 
 # From the project root directory
 storage:
-  tmp: '/var/www/peertube/storage/tmp/' # Use to download data (imports etc), store uploaded files before and during processing...
-  bin: '/var/www/peertube/storage/bin/'
-  avatars: '/var/www/peertube/storage/avatars/'
-  videos: '/var/www/peertube/storage/videos/'
-  streaming_playlists: '/var/www/peertube/storage/streaming-playlists/'
-  redundancy: '/var/www/peertube/storage/redundancy/'
-  logs: '/var/www/peertube/storage/logs/'
-  previews: '/var/www/peertube/storage/previews/'
-  thumbnails: '/var/www/peertube/storage/thumbnails/'
-  torrents: '/var/www/peertube/storage/torrents/'
-  captions: '/var/www/peertube/storage/captions/'
-  cache: '/var/www/peertube/storage/cache/'
-  plugins: '/var/www/peertube/storage/plugins/'
+  tmp: '/home/pacs/{{pac}}/users/{{user}}/storage/tmp/' # Use to download data (imports etc), store uploaded files before and during processing...
+  bin: '/home/pacs/{{pac}}/users/{{user}}/storage/bin/'
+  avatars: '/home/pacs/{{pac}}/users/{{user}}/storage/avatars/'
+  videos: '/home/pacs/{{pac}}/users/{{user}}/storage/videos/'
+  streaming_playlists: '/home/pacs/{{pac}}/users/{{user}}/storage/streaming-playlists/'
+  redundancy: '/home/pacs/{{pac}}/users/{{user}}/storage/redundancy/'
+  logs: '/home/pacs/{{pac}}/users/{{user}}/storage/logs/'
+  previews: '/home/pacs/{{pac}}/users/{{user}}/storage/previews/'
+  thumbnails: '/home/pacs/{{pac}}/users/{{user}}/storage/thumbnails/'
+  torrents: '/home/pacs/{{pac}}/users/{{user}}/storage/torrents/'
+  captions: '/home/pacs/{{pac}}/users/{{user}}/storage/captions/'
+  cache: '/home/pacs/{{pac}}/users/{{user}}/storage/cache/'
+  plugins: '/home/pacs/{{pac}}/users/{{user}}/storage/plugins/'
   # Overridable client files in client/dist/assets/images:
   # - logo.svg
   # - favicon.png
@@ -130,7 +131,7 @@ storage:
   # Could contain for example assets/images/favicon.png
   # If the file exists, peertube will serve it
   # If not, peertube will fallback to the default file
-  client_overrides: '/var/www/peertube/storage/client-overrides/'
+  client_overrides: '/home/pacs/{{pac}}/users/{{user}}/storage/client-overrides/'
 
 object_storage:
   enabled: false

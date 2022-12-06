@@ -1,5 +1,6 @@
 ---
 - hosts: peertube
+  become_user: "{{pac}}-{{user}}"
   vars:
     ansible_python_interpreter: /usr/bin/python3
     # see https://docs.ansible.com/ansible/latest/user_guide/become.html#risks-of-becoming-an-unprivileged-user
@@ -7,36 +8,59 @@
     ansible_remote_tmp: ~/.ansible/tmp
 
   tasks:
-  - name: Create user, domain and database
-    import_tasks: tasks/hs_basis.yml
+  # this should be done separately to install the postgresql extensions
+  #- name: Create user, domain and database
+  #  import_tasks: tasks/hs_basis.yml
 
   #################################
   ## create directories
   #################################
   - name: create directory etc
     become: yes
-    become_user: "{{pac}}-{{user}}"
     file:
       path: "/home/pacs/{{pac}}/users/{{user}}/etc"
       state: directory
+  - name: create directory bin
+    become: yes
+    file:
+      path: "/home/pacs/{{pac}}/users/{{user}}/bin"
+      state: directory
   - name: create directory var/tmp
     become: yes
-    become_user: "{{pac}}-{{user}}"
     file:
       path: "/home/pacs/{{pac}}/users/{{user}}/var/tmp"
       state: directory
   - name: create directory var/log
     become: yes
-    become_user: "{{pac}}-{{user}}"
     file:
       path: "/home/pacs/{{pac}}/users/{{user}}/var/log"
       state: directory
   - name: create directory var/run
     become: yes
-    become_user: "{{pac}}-{{user}}"
     file:
       path: "/home/pacs/{{pac}}/users/{{user}}/var/run"
       state: directory
+
+  - name: create directory config
+    become: yes
+    file:
+      path: "/home/pacs/{{pac}}/users/{{user}}/config"
+      mode: '750'
+      state: directory
+
+  # TODO: storage on HDD if that is available
+  - name: create directory storage
+    become: yes
+    file:
+      path: "/home/pacs/{{pac}}/users/{{user}}/storage"
+      state: directory
+
+  - name: create directory versions
+    become: yes
+    file:
+      path: "/home/pacs/{{pac}}/users/{{user}}/versions"
+      state: directory
+
 
   #################################
   ## install requirements
@@ -47,20 +71,64 @@
   ##################################
   ## install peertube
   ##################################
+  - name: download peertube
+    become: yes
+    unarchive:
+      creates: /home/pacs/{{pac}}/users/{{user}}/versions/peertube-v{{peertube_release}}
+      src: "https://github.com/Chocobozzz/PeerTube/releases/download/v{{peertube_release}}/peertube-v{{peertube_release}}.zip"
+      remote_src: yes
+      dest: /home/pacs/{{pac}}/users/{{user}}/versions
 
-  # TODO
+  - name: set symbolic link to latest version
+    become: yes
+    file:
+      src: "/home/pacs/{{pac}}/users/{{user}}/versions/peertube-v{{peertube_release}}"
+      dest: "/home/pacs/{{pac}}/users/{{user}}/peertube-latest"
+      state: link
+
+  - name: yarn install
+    become: yes
+    shell: |
+      source ~/.profile
+      yarn install --production --pure-lockfile || exit -1
+    args:
+      executable: /bin/bash
+      chdir: "/home/pacs/{{pac}}/users/{{user}}/peertube-latest"
+      creates: "/home/pacs/{{pac}}/users/{{user}}/peertube-latest/node_modules"
 
   ##################################
   ## configuration
   ##################################
 
-  # TODO
+  - name: copy the default config file
+    become: yes
+    copy:
+      src: "/home/pacs/{{pac}}/users/{{user}}/peertube-latest/config/default.yaml"
+      dest: "/home/pacs/{{pac}}/users/{{user}}/config/default.yaml"
+      remote_src: true
+
+  - name: upload the production config file
+    become: yes
+    template:
+      # see also peertube-latest/config/production.yaml.example
+      src: "templates/production.yaml"
+      dest: "/home/pacs/{{pac}}/users/{{user}}/config/production.yaml"
+
+  - name: upload the peertube start script
+    become: yes
+    template:
+      src: "templates/start-peertube.sh"
+      dest: "/home/pacs/{{pac}}/users/{{user}}/bin"
+      mode: "744"
 
   ######################
   ## initialise instance
   ######################
 
-  # TODO
+  # start peertube via script
+  # TODO set initial password
+  # export PT_INITIAL_ROOT_PASSWORD
+  # cd /var/www/peertube/peertube-latest && NODE_CONFIG_DIR=/var/www/peertube/config NODE_ENV=production npm run reset-password -- -u root
 
   ########################
   ## setup the apache site
@@ -73,7 +141,6 @@
   ####################################
   - name: start monit as cronjob
     become: yes
-    become_user: "{{pac}}-{{user}}"
     cron:
       name: "start monit at reboot"
       special_time: reboot
@@ -84,7 +151,6 @@
   ##############################################
   - name: start monit
     become: yes
-    become_user: "{{pac}}-{{user}}"
     shell: |
       /usr/bin/monit -c ".monitrc"
     args:
