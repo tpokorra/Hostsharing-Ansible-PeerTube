@@ -120,6 +120,27 @@
       src: "templates/start-peertube.sh"
       dest: "/home/pacs/{{pac}}/users/{{user}}/bin"
       mode: "744"
+  - name: upload the peertube stop script
+    become: yes
+    template:
+      src: "templates/stop-peertube.sh"
+      dest: "/home/pacs/{{pac}}/users/{{user}}/bin"
+      mode: "744"
+
+  - name: upload redis configuration
+    become: yes
+    become_user: "{{pac}}-{{user}}"
+    template: dest="/home/pacs/{{pac}}/users/{{user}}/etc/redis.conf" src="templates/redis.conf" mode=0600
+
+  - name: upload monit configuration
+    become: yes
+    become_user: "{{pac}}-{{user}}"
+    template: dest="/home/pacs/{{pac}}/users/{{user}}/.monitrc" src="templates/monitrc" mode=0600
+
+  - name: upload logrotate configuration
+    become: yes
+    become_user: "{{pac}}-{{user}}"
+    template: dest="/home/pacs/{{pac}}/users/{{user}}/.logrotate" src="templates/logrotate" mode=0600
 
   ######################
   ## initialise instance

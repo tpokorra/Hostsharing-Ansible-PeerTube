@@ -52,9 +52,10 @@ database:
 # You can also specify a 'socket' path to a unix socket but first need to
 # set 'hostname' and 'port' to null
 redis:
-  hostname: 'localhost'
-  port: 6379
-  auth: null
+  hostname: null
+  port: null
+  socket: /home/pacs/{{pac}}/users/{{user}}/var/run/redis-server.sock
+  auth: '{{redispassword}}'
   db: 0
 
 # SMTP server to send emails
@@ -65,7 +66,7 @@ smtp:
   sendmail: null
   hostname: null
   port: 465 # If you use StartTLS: 587
-  username: '{{pac}}_{{user}}'
+  username: '{{pac}}-{{user}}'
   password: '{{password}}'
   tls: true # If you use StartTLS: false
   disable_starttls: false

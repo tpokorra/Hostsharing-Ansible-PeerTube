@@ -8,6 +8,8 @@ peertube:
       user: peertube
       password: testpassw0rd_changeme
 
+      redispassword: testpassw0rd_changeme3
+
       # see https://github.com/Chocobozzz/PeerTube/releases
       peertube_release: "4.3.1"
 

@@ -1,0 +1,31 @@
+/home/pacs/{{pac}}/users/{{user}}/var/log/monit.log {
+   copytruncate
+   daily
+   rotate 7
+   compress
+   missingok
+}
+/home/pacs/{{pac}}/users/{{user}}/var/log/redis.log {
+   copytruncate
+   daily
+   rotate 7
+   compress
+   missingok
+}
+
+/home/pacs/{{pac}}/users/{{user}}/storage/logs/peertube.log {
+    copytruncate
+    daily
+    rotate 7
+    compress
+    missingok
+}
+
+/home/pacs/{{pac}}/users/{{user}}/storage/logs/peertube-audit.log {
+    copytruncate
+    daily
+    rotate 7
+    compress
+    missingok
+}
+ 
