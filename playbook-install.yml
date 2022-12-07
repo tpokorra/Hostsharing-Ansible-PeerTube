@@ -145,18 +145,26 @@
   ######################
   ## initialise instance
   ######################
-
-  # start peertube via script
-  # TODO set initial password
-  # export PT_INITIAL_ROOT_PASSWORD
-  # cd /var/www/peertube/peertube-latest && NODE_CONFIG_DIR=/var/www/peertube/config NODE_ENV=production npm run reset-password -- -u root
+  # this only works on the first initialisation, not if the root user has already been generated with a random password
+  - name: set initial root password
+    become: yes
+    shell: |
+      source $HOME/.profile
+      export PT_INITIAL_ROOT_PASSWORD="{{adminpassword}}"
+      export NODE_CONFIG_DIR=/home/pacs/{{pac}}/users/{{user}}/config
+      export NODE_ENV=production
+      npm run reset-password -- -u root || exit -1
+      touch /home/pacs/{{pac}}/users/{{user}}/.ansible_root_pwd
+    args:
+      executable: /bin/bash
+      chdir: "/home/pacs/{{pac}}/users/{{user}}/peertube-latest"
+      creates: "/home/pacs/{{pac}}/users/{{user}}/.ansible_root_pwd"
 
   ########################
   ## setup the apache site
   ########################
   - name: upload .htaccess file
     become: yes
-    become_user: "{{pac}}-{{user}}"
     template:
       src: "templates/htaccess"
       dest: "/home/pacs/{{pac}}/users/{{user}}/doms/{{domain}}/htdocs-ssl/.htaccess"

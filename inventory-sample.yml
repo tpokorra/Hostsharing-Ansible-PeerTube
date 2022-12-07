@@ -11,6 +11,9 @@ peertube:
       peertube_http_port: 9000
       redispassword: testpassw0rd_changeme3
 
+      adminuser: root
+      adminpassword: testpassw0rd_changeme4
+
       # see https://github.com/Chocobozzz/PeerTube/releases
       peertube_release: "4.3.1"
 
