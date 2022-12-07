@@ -1,0 +1,4 @@
+DirectoryIndex disabled
+RewriteEngine on
+RewriteBase /
+RewriteRule ^(.*) http://localhost:{{peertube_http_port}}/$1 [proxy,last]

@@ -154,8 +154,12 @@
   ########################
   ## setup the apache site
   ########################
-
-  # TODO
+  - name: upload .htaccess file
+    become: yes
+    become_user: "{{pac}}-{{user}}"
+    template:
+      src: "templates/htaccess"
+      dest: "/home/pacs/{{pac}}/users/{{user}}/doms/{{domain}}/htdocs-ssl/.htaccess"
 
   ####################################
   ## install cron jobs

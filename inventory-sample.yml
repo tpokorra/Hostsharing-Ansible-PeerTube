@@ -8,6 +8,7 @@ peertube:
       user: peertube
       password: testpassw0rd_changeme
 
+      peertube_http_port: 9000
       redispassword: testpassw0rd_changeme3
 
       # see https://github.com/Chocobozzz/PeerTube/releases
