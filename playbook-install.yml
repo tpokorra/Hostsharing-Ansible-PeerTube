@@ -126,6 +126,12 @@
       src: "templates/stop-peertube.sh"
       dest: "/home/pacs/{{pac}}/users/{{user}}/bin"
       mode: "744"
+  - name: upload the reset password script
+    become: yes
+    template:
+      src: "templates/resetpwd.sh"
+      dest: "/home/pacs/{{pac}}/users/{{user}}/bin"
+      mode: "744"
 
   - name: upload redis configuration
     become: yes
@@ -141,24 +147,6 @@
     become: yes
     become_user: "{{pac}}-{{user}}"
     template: dest="/home/pacs/{{pac}}/users/{{user}}/.logrotate" src="templates/logrotate" mode=0600
-
-  ######################
-  ## initialise instance
-  ######################
-  # this only works on the first initialisation, not if the root user has already been generated with a random password
-  - name: set initial root password
-    become: yes
-    shell: |
-      source $HOME/.profile
-      export PT_INITIAL_ROOT_PASSWORD="{{adminpassword}}"
-      export NODE_CONFIG_DIR=/home/pacs/{{pac}}/users/{{user}}/config
-      export NODE_ENV=production
-      npm run reset-password -- -u root || exit -1
-      touch /home/pacs/{{pac}}/users/{{user}}/.ansible_root_pwd
-    args:
-      executable: /bin/bash
-      chdir: "/home/pacs/{{pac}}/users/{{user}}/peertube-latest"
-      creates: "/home/pacs/{{pac}}/users/{{user}}/.ansible_root_pwd"
 
   ########################
   ## setup the apache site

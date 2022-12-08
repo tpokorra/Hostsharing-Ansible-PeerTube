@@ -21,3 +21,6 @@ peertube:
       noderelease: 16
       # see https://nodejs.org/download/release/latest-v16.x/
       nodeversion: v16.13.1
+
+      SaasActivationPassword: {{SaasActivationPassword}}
+      SaasInstanceStatus: {{SaasInstanceStatus}}

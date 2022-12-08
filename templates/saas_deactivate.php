@@ -1,7 +1,5 @@
 <?php
 
-include "/home/pacs/{{pac}}/users/{{user}}/nextcloud/config/config.php";
-
 function Get($index, $defaultValue) {
     return isset($_GET[$index]) ? $_GET[$index] : $defaultValue;
 }
@@ -23,7 +21,7 @@ if (!is_run_from_cli()) {
 }
 
 try {
-    $pdo = new PDO('mysql:host=localhost;dbname={{pac}}_{{user}}', '{{pac}}_{{user}}', '{{password}}');
+    $pdo = new PDO('pgsql:host=localhost;dbname={{pac}}_{{user}}', '{{pac}}_{{user}}', '{{password}}');
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     # retrieve all users
     #$stmt = $pdo->query("SELECT uid from ".$CONFIG['dbtableprefix']."users");
