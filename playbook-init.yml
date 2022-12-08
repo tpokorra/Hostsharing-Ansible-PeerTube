@@ -1,5 +1,6 @@
 ---
 - hosts: peertube
+  become_user: "{{pac}}-{{user}}"
   vars:
     ansible_python_interpreter: /usr/bin/python3
     # see https://docs.ansible.com/ansible/latest/user_guide/become.html#risks-of-becoming-an-unprivileged-user
@@ -9,3 +10,10 @@
   tasks:
   - name: Create user, domain and database
     import_tasks: tasks/hs_basis.yml
+
+  - name: Upload pgpass file
+    become: yes
+    template:
+      src: "templates/pgpass"
+      dest: "/home/pacs/{{pac}}/users/{{user}}/.pgpass"
+      mode: "600"
