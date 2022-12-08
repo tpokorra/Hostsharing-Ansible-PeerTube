@@ -1,0 +1,23 @@
+peertube:
+  hosts:
+    {{pac}}:
+      ansible_ssh_host: {{pac}}.hostsharing.net
+      ansible_ssh_user: {{pac}}
+      pac: {{pac}}
+      domain: {{domain}}
+      user: {{username}}
+      password: {{password}}
+
+      peertube_http_port: {{port1}}
+      redispassword: {{password1}}
+
+      adminuser: root
+      adminpassword: {{initial_password}}
+
+      # see https://github.com/Chocobozzz/PeerTube/releases
+      peertube_release: "4.3.1"
+
+      # see https://nodejs.org/en/about/releases/
+      noderelease: 16
+      # see https://nodejs.org/download/release/latest-v16.x/
+      nodeversion: v16.13.1
