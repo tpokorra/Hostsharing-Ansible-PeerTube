@@ -5,6 +5,7 @@ peertube:
       ansible_ssh_user: xyz00
       pac: xyz00
       domain: tube.example.org
+      custom_domain: tube.example.org
       user: peertube
       password: testpassw0rd_changeme
 
