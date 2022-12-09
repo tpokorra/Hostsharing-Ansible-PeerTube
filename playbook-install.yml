@@ -119,19 +119,19 @@
     template:
       src: "templates/start-peertube.sh"
       dest: "/home/pacs/{{pac}}/users/{{user}}/bin"
-      mode: "744"
+      mode: "700"
   - name: upload the peertube stop script
     become: yes
     template:
       src: "templates/stop-peertube.sh"
       dest: "/home/pacs/{{pac}}/users/{{user}}/bin"
-      mode: "744"
+      mode: "700"
   - name: upload the reset password script
     become: yes
     template:
       src: "templates/resetpwd.sh"
       dest: "/home/pacs/{{pac}}/users/{{user}}/bin"
-      mode: "744"
+      mode: "700"
 
   - name: upload redis configuration
     become: yes
