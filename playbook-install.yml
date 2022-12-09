@@ -48,19 +48,47 @@
       mode: '750'
       state: directory
 
-  # TODO: storage on HDD if that is available
-  - name: create directory storage
-    become: yes
-    file:
-      path: "/home/pacs/{{pac}}/users/{{user}}/storage"
-      state: directory
-
   - name: create directory versions
     become: yes
     file:
       path: "/home/pacs/{{pac}}/users/{{user}}/versions"
       state: directory
 
+  #################################
+  ## setup the storage directory
+  #################################
+  - name: Check for HDD storage
+    stat:
+      path: /home/storage/{{pac}}/users/{{user}}
+    register: hdd_storage
+  - name: create data directory on storage
+    become: yes
+    become_user: "{{pac}}-{{user}}"
+    file:
+      path: "/home/storage/{{pac}}/users/{{user}}/data"
+      state: directory
+      mode: 0744
+      recurse: no
+    when: hdd_storage.stat.exists
+
+  - name: create symbolic link for data to storage
+    become: yes
+    become_user: "{{pac}}-{{user}}"
+    file:
+      src: "/home/storage/{{pac}}/users/{{user}}/data"
+      dest: "/home/pacs/{{pac}}/users/{{user}}/storage"
+      state: link
+    when: hdd_storage.stat.exists
+
+  - name: create data directory on ssd
+    become: yes
+    become_user: "{{pac}}-{{user}}"
+    file:
+      path: "/home/pacs/{{pac}}/users/{{user}}/storage"
+      state: directory
+      mode: 0744
+      recurse: no
+    when: not hdd_storage.stat.exists
 
   #################################
   ## install requirements
