@@ -29,6 +29,10 @@ All needed parameters can be set in the inventory file now. Change xyz00 to the 
     
 The option -i can be used to read this inventory file instead of the /etc/ansible/hosts file. We want to login with an SSH-Key. We run:
 
+    $ ansible-playbook -i inventory.yml playbook-init.yml
+
+Then ask the Hostsharing Service to install the PostgreSQL extensions `pg_trgm` and `unaccent`. Once those have been installed, you can continue:
+
     $ ansible-playbook -i inventory.yml playbook-install.yml
 
 Now we can reach our site via:
