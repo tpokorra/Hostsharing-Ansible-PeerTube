@@ -1,0 +1,66 @@
+---
+- hosts: peertube
+  become_user: "{{pac}}-{{user}}"
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+    # see https://docs.ansible.com/ansible/latest/user_guide/become.html#risks-of-becoming-an-unprivileged-user
+    ansible_common_remote_group: "{{pac}}"
+    ansible_remote_tmp: ~/.ansible/tmp
+
+  tasks:
+  # see peertube-latest/scripts/upgrade.sh
+  - name: download peertube
+    become: yes
+    unarchive:
+      creates: /home/pacs/{{pac}}/users/{{user}}/versions/peertube-v{{peertube_release}}
+      src: "https://github.com/Chocobozzz/PeerTube/releases/download/v{{peertube_release}}/peertube-v{{peertube_release}}.zip"
+      remote_src: yes
+      dest: /home/pacs/{{pac}}/users/{{user}}/versions
+
+  - name: set symbolic link to latest version
+    become: yes
+    file:
+      src: "/home/pacs/{{pac}}/users/{{user}}/versions/peertube-v{{peertube_release}}"
+      dest: "/home/pacs/{{pac}}/users/{{user}}/peertube-latest"
+      state: link
+
+  - name: yarn install
+    become: yes
+    shell: |
+      source ~/.profile
+      NOCLIENT=1 yarn install --production --pure-lockfile || exit -1
+    args:
+      executable: /bin/bash
+      chdir: "/home/pacs/{{pac}}/users/{{user}}/peertube-latest"
+
+  - name: clean cache
+    become: yes
+    file:
+      path: "/home/pacs/{{pac}}/users/{{user}}/.cache"
+      state: absent
+
+  # check diff: diff -uNr ~/config/production.yaml ~/peertube-latest/config/production.yaml.example
+  - name: upload the production config file
+    become: yes
+    template:
+      # see also peertube-latest/config/production.yaml.example
+      src: "templates/production.yaml"
+      dest: "/home/pacs/{{pac}}/users/{{user}}/config/production.yaml"
+
+  - name: run migration script
+    become: yes
+    shell: |
+        source ~/.profile
+        NODE_CONFIG_DIR=/home/pacs/{{pac}}/users/{{user}}/config NODE_ENV=production node dist/scripts/migrations/peertube-5.0.js || exit -1
+    args:
+        executable: /bin/bash
+        chdir: "/home/pacs/{{pac}}/users/{{user}}/peertube-latest"
+
+  - name: restart peertube
+    become: yes
+    shell: |
+        ./bin/stop-peertube.sh
+        ./bin/start-peertube.sh || exit -1
+    args:
+        executable: /bin/bash
+        chdir: "/home/pacs/{{pac}}/users/{{user}}"
