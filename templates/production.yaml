@@ -8,6 +8,11 @@ webserver:
   hostname: '{{custom_domain}}'
   port: 443
 
+# Secrets you need to generate the first time you run PeerTube
+secrets:
+  # Generate one using `openssl rand -hex 32`
+  peertube: '{{RandomOpenSSLRandHex32}}'
+
 rates_limit:
   api:
     # 50 attempts in 10 seconds
@@ -122,6 +127,7 @@ storage:
   captions: '/home/pacs/{{pac}}/users/{{user}}/storage/captions/'
   cache: '/home/pacs/{{pac}}/users/{{user}}/storage/cache/'
   plugins: '/home/pacs/{{pac}}/users/{{user}}/storage/plugins/'
+  well_known: '/home/pacs/{{pac}}/users/{{user}}/storage/well_known/'
   # Overridable client files in client/dist/assets/images:
   # - logo.svg
   # - favicon.png
@@ -134,6 +140,10 @@ storage:
   # If not, peertube will fallback to the default file
   client_overrides: '/home/pacs/{{pac}}/users/{{user}}/storage/client-overrides/'
 
+static_files:
+  # Require and check user authentication when accessing private files (internal/private video files)
+  private_files_require_auth: true
+
 object_storage:
   enabled: false
 
@@ -142,8 +152,19 @@ object_storage:
 
   region: 'us-east-1'
 
-  # Set this ACL on each uploaded object
-  upload_acl: 'public-read'
+  upload_acl:
+    # Set this ACL on each uploaded object of public/unlisted videos
+    public: 'public-read'
+    # Set this ACL on each uploaded object of private/internal videos
+    # PeerTube can proxify requests to private objects so your users can access them
+    private: 'private'
+
+  proxy:
+    # If private files (private/internal video files) have a private ACL, users can't access directly the ressource
+    # PeerTube can proxify requests between your object storage service and your users
+    # If you disable PeerTube proxy, ensure you use your own proxy that is able to access the private files
+    # Or you can also set a public ACL for private files in object storage if you don't want to use a proxy
+    proxify_private_files: true
 
   credentials:
     # You can also use AWS_ACCESS_KEY_ID env variable
@@ -188,13 +209,15 @@ log:
   # Accept warn/error logs coming from the client
   accept_client_log: true
 
-# Highly experimental support of Open Telemetry
+# Support of Open Telemetry metrics and tracing
+# For more information: https://docs.joinpeertube.org/maintain-observability
 open_telemetry:
   metrics:
     enabled: false
 
     # Create a prometheus exporter server on this port so prometheus server can scrape PeerTube metrics
     prometheus_exporter:
+      hostname: '127.0.0.1'
       port: 9091
 
   tracing:
@@ -569,6 +592,9 @@ import:
     # Number of latest published videos to check and to potentially import when syncing a channel
     videos_limit_per_synchronization: 10
 
+    # Max number of videos to import when the user asks for full sync
+    full_sync_videos_limit: 1000
+
 auto_blacklist:
   # New videos automatically blacklisted so moderators can review before publishing
   videos:
@@ -650,7 +676,8 @@ instance:
   robots: |
     User-agent: *
     Disallow:
-  # Security.txt rules. To discourage researchers from testing your instance and disable security.txt integration, set this to an empty string
+  # /.well-known/security.txt rules. This endpoint is cached, so you may have to wait a few hours before viewing your changes
+  # To discourage researchers from testing your instance and disable security.txt integration, set this to an empty string
   securitytxt:
     '# If you would like to report a security issue\n# you may report it to:\nContact: https://github.com/Chocobozzz/PeerTube/blob/develop/SECURITY.md\nContact: mailto:'
 
