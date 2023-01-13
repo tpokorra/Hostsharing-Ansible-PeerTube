@@ -160,6 +160,12 @@
       src: "templates/resetpwd.sh"
       dest: "/home/pacs/{{pac}}/users/{{user}}/bin"
       mode: "700"
+  - name: upload the reset domain script
+    become: yes
+    template:
+      src: "templates/reset_domain.sh"
+      dest: "/home/pacs/{{pac}}/users/{{user}}/bin"
+      mode: "700"
 
   - name: upload redis configuration
     become: yes
@@ -214,3 +220,11 @@
       chdir: "/home/pacs/{{pac}}/users/{{user}}/"
       creates: "/home/pacs/{{pac}}/users/{{user}}/var/run/monit.id"
 
+  ################
+  ## clean cache
+  ################
+  - name: clean cache
+    become: yes
+    file:
+      path: "/home/pacs/{{pac}}/users/{{user}}/.cache"
+      state: absent
