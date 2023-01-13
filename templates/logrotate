@@ -28,4 +28,12 @@
     compress
     missingok
 }
- 
+
+/home/pacs/{{pac}}/users/{{user}}/var/log/peertube.log {
+    copytruncate
+    daily
+    rotate 7
+    compress
+    missingok
+}
+
