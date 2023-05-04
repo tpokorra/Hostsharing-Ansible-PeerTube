@@ -38,9 +38,9 @@ rates_limit:
     max: 10
 
 oauth2:
-token_lifetime:
-  access_token: '1 day'
-  refresh_token: '2 weeks'
+  token_lifetime:
+    access_token: '1 day'
+    refresh_token: '2 weeks'
 
 # Proxies to trust to get real client IP
 # If you run PeerTube just behind a local proxy (nginx), keep 'loopback'
@@ -161,9 +161,11 @@ object_storage:
 
   upload_acl:
     # Set this ACL on each uploaded object of public/unlisted videos
+    # Use null if your S3 provider does not support object ACL
     public: 'public-read'
     # Set this ACL on each uploaded object of private/internal videos
     # PeerTube can proxify requests to private objects so your users can access them
+    # Use null if your S3 provider does not support object ACL
     private: 'private'
 
   proxy:
@@ -217,7 +219,7 @@ log:
   accept_client_log: true
 
 # Support of Open Telemetry metrics and tracing
-# For more information: https://docs.joinpeertube.org/maintain-observability
+# For more information: https://docs.joinpeertube.org/maintain/observability
 open_telemetry:
   metrics:
     enabled: false
@@ -240,12 +242,14 @@ open_telemetry:
 
 trending:
   videos:
-    interval_days: 7 # Compute trending videos for the last x days
+    interval_days: 7 # Compute trending videos for the last x days for 'most-viewed' algorithm
+
     algorithms:
       enabled:
-        - 'hot' # adaptation of Reddit's 'Hot' algorithm
-        - 'most-viewed' # default, used initially by PeerTube as the trending page
-        - 'most-liked'
+        - 'hot' # Adaptation of Reddit's 'Hot' algorithm
+        - 'most-viewed' # Number of views in the last x days
+        - 'most-liked' # Global views since the upload of the video
+
       default: 'most-viewed'
 
 # Cache remote videos on your server, to help other instances to broadcast the video
@@ -290,10 +294,10 @@ security:
   frameguard:
     enabled: true
 
-    # Set x-powered-by HTTP header to "PeerTube"
-    # Can help remote software to know this is a PeerTube instance
-    powered_by_header:
-      enabled: true
+  # Set x-powered-by HTTP header to "PeerTube"
+  # Can help remote software to know this is a PeerTube instance
+  powered_by_header:
+    enabled: true
 
 tracker:
   # If you disable the tracker, you disable the P2P on your PeerTube instance
@@ -403,7 +407,9 @@ contact_form:
 
 signup:
   enabled: false
+
   limit: 10 # When the limit is reached, registrations are disabled. -1 == unlimited
+
   minimum_age: 16 # Used to configure the signup form
 
   # Users fill a form to register so moderators can accept/reject the registration
@@ -416,6 +422,10 @@ signup:
       blacklist: []
 
 user:
+  history:
+    videos:
+      # Enable or disable video history by default for new users.
+      enabled: true
   # Default value of maximum video bytes the user can upload (does not take into account transcoded files)
   # Byte format is supported ("1GB" etc)
   # -1 == unlimited
@@ -574,7 +584,7 @@ import:
     # Classic HTTP or all sites supported by youtube-dl https://rg3.github.io/youtube-dl/supportedsites.html
     http:
       # We recommend to use a HTTP proxy if you enable HTTP import to prevent private URL access from this server
-      # See https://docs.joinpeertube.org/maintain-configuration?id=security for more information
+      # See https://docs.joinpeertube.org/maintain/configuration#security for more information
       enabled: false
 
       youtube_dl_release:
@@ -598,7 +608,7 @@ import:
     # Magnet URI or torrent file (use classic TCP/UDP/WebSeed to download the file)
     torrent:
       # We recommend to only enable magnet URI/torrent import if you trust your users
-      # See https://docs.joinpeertube.org/maintain-configuration?id=security for more information
+      # See https://docs.joinpeertube.org/maintain/configuration#security for more information
       enabled: false
 
   # Add ability for your users to synchronize their channels with external channels, playlists, etc.
