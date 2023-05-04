@@ -18,7 +18,7 @@ peertube:
       RandomOpenSSLRandHex32: {{RandomOpenSSLRandHex32}}
 
       # see https://github.com/Chocobozzz/PeerTube/releases
-      peertube_release: "5.0.1"
+      peertube_release: "5.1.0"
 
       # see https://nodejs.org/en/about/releases/
       noderelease: 16
